@@ -2,19 +2,29 @@
 #include "version.h"
 #include "i18n.h"
 #include "swapper.h"
+
 #define MOON_LED_LEVEL LED_LEVEL
 #ifndef ZSA_SAFE_RANGE
 #define ZSA_SAFE_RANGE SAFE_RANGE
 #endif
 
-bool sw_win_active = false;
 
 enum custom_keycodes {
   RGB_SLD = ZSA_SAFE_RANGE,
   SW_WIN,
 };
 
+// Key sequences (in flash)
+static const uint16_t PROGMEM keys_win[] = { KC_TAB };
+// Add new sequences here, e.g.:
+// static const uint16_t PROGMEM keys_win_back[] = { KC_LSFT, KC_TAB };
 
+// Swapper table — add one row per swapper
+swapper_t swappers[] = {
+    { SW_WIN, KC_LGUI, keys_win, 1, false },
+    // { SW_WIN_BACK, KC_LGUI, keys_win_back, 2, false },
+};
+#define SWAPPER_COUNT (sizeof(swappers) / sizeof(swapper_t))
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -84,15 +94,21 @@ combo_t key_combos[COMBO_COUNT] = {
 };
 
 
-
-
-
-
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-  if (!update_swapper(&sw_win_active, KC_LGUI, KC_TAB, SW_WIN, keycode, record)) {
-    return false;
-  }
+    // Run all swappers
+    for (uint8_t i = 0; i < SWAPPER_COUNT; i++) {
+        if (!update_swapper(&swappers[i], keycode, record)) {
+            return false;
+        }
+    }
+
+    // Release all swappers when any momentary layer key is released
+    if (keycode >= QK_MOMENTARY && keycode <= QK_MOMENTARY_MAX) {
+        if (!record->event.pressed) {
+            release_all_swappers(swappers, SWAPPER_COUNT);
+        }
+    }
+
   switch (keycode) {
   case QK_MODS ... QK_MODS_MAX:
     // Mouse and consumer keys (volume, media) with modifiers work inconsistently across operating systems,

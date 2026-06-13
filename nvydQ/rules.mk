@@ -6,4 +6,7 @@ RGB_MATRIX_CUSTOM_KB = yes
 SPACE_CADET_ENABLE = no
 CAPS_WORD_ENABLE = yes
 COMBO_ENABLE = yes
+
+
+# custom QMK
 SRC += swapper.c
