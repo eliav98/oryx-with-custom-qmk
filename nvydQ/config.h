@@ -8,7 +8,7 @@
 #define RGB_MATRIX_TIMEOUT 300000
 
 #define USB_SUSPEND_WAKEUP_DELAY 0
-#define SERIAL_NUMBER "nvydQ/EemJxD"
+#define SERIAL_NUMBER "nvydQ/x9BZmY"
 #define LAYER_STATE_8BIT
 #define COMBO_COUNT 1
 
