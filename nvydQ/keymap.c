@@ -1,13 +1,17 @@
 #include QMK_KEYBOARD_H
 #include "version.h"
 #include "i18n.h"
+#include "swapper.h"
 #define MOON_LED_LEVEL LED_LEVEL
 #ifndef ZSA_SAFE_RANGE
 #define ZSA_SAFE_RANGE SAFE_RANGE
 #endif
 
+bool sw_win_active = false;
+
 enum custom_keycodes {
   RGB_SLD = ZSA_SAFE_RANGE,
+  SW_WIN,
 };
 
 
@@ -24,7 +28,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [1] = LAYOUT_voyager(
     TO(3),          KC_F1,          KC_F2,          KC_F3,          KC_F4,          KC_F5,                                          KC_F6,          KC_F7,          KC_F8,          KC_F9,          KC_F10,         KC_F11,         
     KC_TRANSPARENT, LGUI(KC_Q),     LGUI(KC_W),     KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,                                 LALT(KC_LEFT),  LALT(KC_BSPC),  KC_BSPC,        LALT(KC_RIGHT), KC_PAGE_UP,     KC_F12,         
-    LGUI(KC_TAB),   LGUI(KC_A),     OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_TRANSPARENT,                                 KC_LEFT,        KC_DOWN,        KC_UP,          KC_RIGHT,       KC_ENTER,       KC_PLUS,        
+    SW_WIN,   LGUI(KC_A),     OSM(MOD_LCTL),  OSM(MOD_LALT),  OSM(MOD_LGUI),  KC_TRANSPARENT,                                 KC_LEFT,        KC_DOWN,        KC_UP,          KC_RIGHT,       KC_ENTER,       KC_PLUS,        
     KC_F18,         KC_MAC_UNDO,    KC_MAC_CUT,     KC_MAC_COPY,    KC_MAC_PASTE,   KC_TRANSPARENT,                                 KC_HOME,        LALT(KC_DELETE),KC_DELETE,      KC_END,         KC_PGDN,        KC_EQUAL,       
                                                     KC_TRANSPARENT, MO(5),                                          KC_TRANSPARENT, LGUI(KC_SPACE)
   ),
@@ -86,6 +90,9 @@ combo_t key_combos[COMBO_COUNT] = {
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  if (!update_swapper(&sw_win_active, KC_LGUI, KC_TAB, SW_WIN, keycode, record)) {
+    return false;
+  }
   switch (keycode) {
   case QK_MODS ... QK_MODS_MAX:
     // Mouse and consumer keys (volume, media) with modifiers work inconsistently across operating systems,
